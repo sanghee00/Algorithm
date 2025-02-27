@@ -2,66 +2,84 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
 public class Main {
+    public static List<Integer>[] person; // 받을 사람
+    public static int count; // 카운트
+    public static int result = -1; // 카운트
+    public static boolean[] visited; // 방문 처리
+    public static int end;
 
-    static List<Integer>[] relation;
-    static boolean[] checked;
-    static int res = -1; // 기본 값
-    public static void main(String[] args) throws IOException{
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    public static void solution(int[][] graph, int start, int n) {
+        person = new ArrayList[n + 1];
 
-        int n = Integer.parseInt(br.readLine());
-        relation = new ArrayList[n + 1];
-        checked = new boolean[n + 1];
-        for(int i = 1; i <= n; i++) {
-            relation[i] = new ArrayList<>();
+        for (int i = 0; i < person.length; i++) {
+            person[i] = new ArrayList<>();
         }
 
-        StringTokenizer st = new StringTokenizer(br.readLine());
-
-        int x = Integer.parseInt(st.nextToken());
-        int y = Integer.parseInt(st.nextToken());
-
-        int l = Integer.parseInt(br.readLine());
-
-        // 인접 리스트를 만든다.
-        // 1 - 2, 3
-        // 2 - 1, 7, 8, 9
-        // 3 - 1
-        // 4 - 5, 6
-        // 5 - 4
-        // 6 - 4
-        // 7 - 2
-        for(int i=0; i<l; i++) {
-            st = new StringTokenizer(br.readLine());
-            int p = Integer.parseInt(st.nextToken());
-            int c = Integer.parseInt(st.nextToken());
-            relation[p].add(c);
-            relation[c].add(p);
+        for (int[] edge : graph) {
+            person[edge[0]].add(edge[1]);
+            person[edge[1]].add(edge[0]);
         }
 
-        dfs(x,y, 0);
-        System.out.println(res);
+//        System.out.println(Arrays.toString(person));
+        visited = new boolean[n + 1];
+
+        dfs(start);
     }
 
-    static void dfs(int start, int end, int cnt) {
-        if(start == end) {
-            res = cnt;
+    public static void dfs(int start) {
+        visited[start] = true; // 방문 후 true
+        if (start == end) {
+            result = count;
             return;
         }
 
-        // 7일 경우 바로 방문 한거로 친다.
-        checked[start] = true;
-
-        // 인접 리스트를 하는 씩 돈다
-        for (int i : relation[start]) {
-            if (!checked[i]) { // 방문 하지 않은 경우
-                dfs(i, end, cnt + 1);
+        for (int n : person[start]) {
+            // 방문하지 않았다면
+            if(!visited[n]) {
+                count++;
+                dfs(n);
+                count--;
             }
         }
 
     }
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n = Integer.parseInt(br.readLine()); // 사람 수
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        int p2 = Integer.parseInt(st.nextToken()); // 사람1
+        int p1 = Integer.parseInt(st.nextToken()); // 사람2
+        end = p2;
+
+        int m = Integer.parseInt(br.readLine()); // 간선
+        int[][] graph = new int[m + 1][2];
+
+        for (int i = 1; i < m + 1; i++) {
+            st = new StringTokenizer(br.readLine());
+            for (int j = 0; j < 2; j++) {
+                graph[i][j] = Integer.parseInt(st.nextToken());
+            }
+        }
+
+        /*for (int i = 0; i < graph.length; i++) {
+            for (int j = 0; j < 2; j++) {
+                System.out.print(graph[i][j] + " ");
+            }
+            System.out.println();
+
+        }*/
+
+
+        solution(graph, p1, n);
+
+        System.out.println(result);
+    }
 }
+
