@@ -1,119 +1,97 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
+import java.io.*;
 
 public class Main {
-
-    static int[] dx = {-1, 1, 0, 0};
-    static int[] dy = {0, 0, -1, 1};
     static Tomato[][] box;
     static boolean[][] visited;
-    static int n;
-    static int m;
-    static ArrayList<Xy> xyIndex = new ArrayList<>();
+    static int[] dx = {-1, 1, 0, 0};
+    static int[] dy = {0, 0, -1, 1};
 
-    static class Tomato {
+    public static class Tomato {
+        int x;
+        int y;
         int day;
-        int x;
-        int y;
 
-        public Tomato(int day, int x, int y) {
+        public Tomato(int x, int y, int day) {
+            this.x = x;
+            this.y = y;
             this.day = day;
-            this.x = x;
-            this.y = y;
-        }
-
-        @Override
-        public String toString() {
-//            return " | " + "day " + day + " x: " + x + "y: " + y + " | ";
-            return " | " + "day " + day + " | ";
         }
     }
 
-    static class  Xy {
-        int x;
-        int y;
-
-        public Xy(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        @Override
-        public String toString() {
-            return "x : " + x + " y : " + y;
-        }
-
-    }
-
-    public static int bfs(ArrayList<Xy> xy) {
-        ArrayDeque<Tomato> queue = new ArrayDeque<>();
-        int result = 0;
-        for (Xy xy1 : xy) {
-            queue.add(box[xy1.y][xy1.x]);
-            visited[xy1.y][xy1.x] = true;
-        }
+    public static void bfs(int M, int N, ArrayDeque<Tomato> queue) {
 
         while (!queue.isEmpty()) {
-            Tomato pollTomato = queue.poll();
-            result = pollTomato.day;
+            Tomato poll = queue.poll();
 
             for (int i = 0; i < 4; i++) {
-                int xx = dx[i] + pollTomato.x;
-                int yy = dy[i] + pollTomato.y;
+                int xx = dx[i] + poll.x;
+                int yy = dy[i] + poll.y;
 
-                if (xx >= 0 && yy >= 0 && xx < m && yy < n && !visited[yy][xx] && box[yy][xx].day != -1) {
+                if (xx >= 0 && yy >= 0 && xx < M && yy < N && !visited[yy][xx] && box[yy][xx].day != -1) {
                     visited[yy][xx] = true;
-                    box[yy][xx] = new Tomato(pollTomato.day + 1, xx, yy);
+                    box[yy][xx].day = poll.day + 1;
                     queue.add(box[yy][xx]);
                 }
             }
         }
 
-        return result;
     }
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
+        ArrayDeque<Tomato> queue = new ArrayDeque<>();
 
-        m = Integer.parseInt(st.nextToken()); // 가로
-        n = Integer.parseInt(st.nextToken()); // 세로
+        int M = Integer.parseInt(st.nextToken()); // 가로
+        int N = Integer.parseInt(st.nextToken()); // 세로
 
-        box = new Tomato[n][m];
-        visited = new boolean[n][m];
+        box = new Tomato[N][M];
+        visited = new boolean[N][M];
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < m; j++) {
-                box[i][j] = new Tomato(Integer.parseInt(st.nextToken()), j, i);
+            for (int j = 0; j < M; j++) {
+                int tomato = Integer.parseInt(st.nextToken());
+
+                // 토마토가 있는 곳은 바로 큐에 넣는다.
+                if (tomato == 1) {
+                    visited[i][j] = true;
+                    queue.add(new Tomato(j, i, tomato));
+                }
+                box[i][j] = new Tomato(j, i, tomato);
             }
         }
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if (box[i][j].day == 1) {
-                    xyIndex.add(new Xy(j, i));
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                if (box[i][j].day != 0) {
+                    bfs(M, N, queue);
                 }
             }
         }
 
 
-        int endBfs = bfs(xyIndex);;
-        int total = 0;
-        for (Tomato[] t : box) {
-            for (Tomato tomato: t) {
-                if (tomato.day == 0) {
-                    total = -1;
-                }
-            }
-        }
-
-        if (total == -1) {
-            System.out.println(total);
-        } else {
-            System.out.println(endBfs - 1);
-        }
+        System.out.println(check(N, M));
     }
+    public static int check(int N, int M) {
+        int max = box[0][0].day;
+        int day;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                day = box[i][j].day;
+                if (day == 0) {
+                    return -1;
+                }
+
+                if (max < day) {
+                    max = day;
+                }
+            }
+        }
+
+        return max - 1;
+    }
+
+
 }
