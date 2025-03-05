@@ -2,44 +2,45 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
+    static boolean[] checked;
     static int num;
     static int[] arr;
-    static boolean[] check;
-    static List<Integer> answer;
-    public static void main(String[] args) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static List<Integer> result = new ArrayList<>();
 
-        int N = Integer.parseInt(br.readLine());
-        arr = new int[N];
-        check = new boolean[N];
-        for (int i = 0; i < N; i++) {
-            arr[i] = Integer.parseInt(br.readLine()) - 1;
-        }
-        answer = new LinkedList<>();
-
-        for (int i = 0; i < N; i++) {
-            check[i] = true;
-            num = i;
-            dfs(i);
-            check[i] = false;
+    public static void dfs(int i) {
+        if (num == arr[i]) {
+            result.add(arr[i]);
         }
 
-        Collections.sort(answer);
-        System.out.println(answer.size());
-        for (Integer integer : answer) {
-            System.out.println(integer + 1);
+        if (!checked[arr[i]]) {
+            checked[arr[i]] = true;
+            dfs(arr[i]);
+            checked[arr[i]] = false;
         }
     }
 
-    public static void dfs(int i) {
-        if (arr[i] == num) { 
-            answer.add(num);
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n = Integer.parseInt(br.readLine());
+        arr = new int[n];
+        checked = new boolean[n];
+
+        for (int i = 0; i < n; i++) {
+            arr[i] = Integer.parseInt(br.readLine()) - 1;
         }
 
-        if (!check[arr[i]]) {
-            check[arr[i]] = true;
-            dfs(arr[i]);
-            check[arr[i]] = false;
+        for (int i = 0; i < n; i++) {
+            checked[i] = true;
+            num = i;
+            dfs(i);
+            checked[i] = false;
         }
+
+        System.out.println(result.size());
+        Collections.sort(result);
+        for (int i : result) {
+            System.out.println(i + 1);
+        }
+
     }
 }
