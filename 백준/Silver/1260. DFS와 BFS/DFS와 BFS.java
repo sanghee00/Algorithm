@@ -1,19 +1,32 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
+import java.io.*;
 
 public class Main {
-    public static List<Integer>[] adjList;
-    public static List<Integer> result;
-    public static boolean[] visited;
 
-    public static void solution(int[][] graph, int startNode, int n) {
+    public static List<Integer>[] adjList;
+    public static boolean[] visited;
+    public static List<Integer> result = new ArrayList<>();
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        int n = Integer.parseInt(st.nextToken()); //
+        int m = Integer.parseInt(st.nextToken()); // 간선의 개수
+        int v = Integer.parseInt(st.nextToken()); // 시작 정점
+
+        int[][] graph = new int[m][2];
+
+        for (int i = 0; i < m; i++) {
+            st = new StringTokenizer(br.readLine());
+            graph[i][0] = Integer.parseInt(st.nextToken());
+            graph[i][1] = Integer.parseInt(st.nextToken());
+        }
+
         adjList = new ArrayList[n + 1];
         visited = new boolean[n + 1];
-        result = new ArrayList<>();
 
-        for (int i = 0; i < adjList.length; i++) {
+        for (int i = 0; i < n + 1; i++) {
             adjList[i] = new ArrayList<>();
         }
 
@@ -26,64 +39,52 @@ public class Main {
             Collections.sort(adjList[i]);
         }
 
-        dfs(startNode);
+
+        dfs(v);
+        print();
+        visited = new boolean[n + 1];
+        result = new ArrayList<>();
+        bfs(v);
+        print();
+    }
+
+    public static void print() {
         for (int i : result) {
             System.out.print(i + " ");
         }
         System.out.println();
-        result = new ArrayList<>();
-        visited = new boolean[n + 1];
-        bfs(startNode);
-        for (int i : result) {
-            System.out.print(i + " ");
-        }
     }
 
-    public static void dfs(int node) {
-        visited[node] = true;
-        result.add(node);
+    public static void dfs(int startNode) {
+        visited[startNode] = true;
+        result.add(startNode);
 
-        for (int now : adjList[node]) {
+        for (int now : adjList[startNode]) {
             if (!visited[now]) {
+                visited[now] = true;
                 dfs(now);
             }
         }
+
     }
 
     public static void bfs(int startNode) {
-        ArrayDeque<Integer> queue = new ArrayDeque<>();
-        queue.add(startNode);
+        Queue<Integer> queue = new ArrayDeque<>();
         visited[startNode] = true;
+        queue.add(startNode);
+        result.add(startNode);
 
         while (!queue.isEmpty()) {
-            int poll = queue.poll();
-            result.add(poll);
 
-            for (int now : adjList[poll]) {
-                if (!visited[now]) {
-                    visited[now] = true;
-                    queue.add(now);
+            int poll = queue.poll();
+
+            for (int i : adjList[poll]) {
+                if (!visited[i]) {
+                    result.add(i);
+                    visited[i] = true;
+                    queue.add(i);
                 }
             }
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-
-        int n = Integer.parseInt(st.nextToken()); // 정점의 개수
-        int m = Integer.parseInt(st.nextToken()); // 간선의 개수
-        int v = Integer.parseInt(st.nextToken()); // 시작할 노드
-
-        int[][] graph = new int[m][2];
-
-        for (int i = 0; i < m; i++) {
-            st = new StringTokenizer(br.readLine());
-            graph[i][0] = Integer.parseInt(st.nextToken());
-            graph[i][1] = Integer.parseInt(st.nextToken());
-        }
-
-        solution(graph, v, n);
     }
 }
