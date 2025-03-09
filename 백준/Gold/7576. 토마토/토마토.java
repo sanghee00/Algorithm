@@ -2,46 +2,27 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int[] dx = {-1, 1, 0, 0};
-    static int[] dy = {0, 0, -1, 1};
-    static Queue<Tomato> queue = new ArrayDeque<>();
-    static int m;
-    static int n;
     static boolean[][] visited;
     static int[][] box;
+    static Queue<Tomato> queue;
+    static int[] dx = {-1, 1, 0, 0};
+    static int[] dy = {0, 0, -1, 1};
+    static int n;
+    static int m;
 
     static class Tomato {
         int x;
         int y;
-        int value;
+        int cnt;
 
-        public Tomato(int x, int y, int value) {
+        public Tomato(int x, int y, int cnt) {
             this.x = x;
             this.y = y;
-            this.value = value;
-        }
-    }
-
-    public static void bfs() {
-
-        while (!queue.isEmpty()) {
-            Tomato tomato = queue.poll();
-
-            for (int i = 0; i < 4; i++) {
-                int nx = dx[i] + tomato.x;
-                int ny = dy[i] + tomato.y;
-
-                if (nx >= 0 && ny >= 0 && nx < m && ny < n && !visited[ny][nx] && box[ny][nx] == 0) {
-                    visited[ny][nx] = true;
-                    box[ny][nx] = tomato.value + 1;
-                    queue.add(new Tomato(nx, ny, tomato.value + 1));
-                }
-            }
+            this.cnt = cnt;
         }
     }
 
@@ -51,42 +32,61 @@ public class Main {
 
         m = Integer.parseInt(st.nextToken());
         n = Integer.parseInt(st.nextToken());
-
         box = new int[n][m];
         visited = new boolean[n][m];
+        queue = new ArrayDeque<>();
 
         for (int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
             for (int j = 0; j < m; j++) {
                 int num = Integer.parseInt(st.nextToken());
-
                 if (num == 1) {
-                    queue.add(new Tomato(j, i, 1));
                     visited[i][j] = true;
+                    queue.add(new Tomato(j, i, 1));
                 }
-
                 box[i][j] = num;
             }
         }
 
         bfs();
-
-        boolean result = false;
-        int total = Integer.MIN_VALUE;
-        for (int[] i : box) {
-            for (int j : i) {
-                if (j == 0) {
-                    result = true;
+        int result = Integer.MIN_VALUE;
+        int total = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (box[i][j] == 0) {
+                    result = -1;
+                    break;
+                } else if (total < box[i][j]) {
+                    total = box[i][j];
                 }
-                total = Math.max(total, j);
             }
         }
 
-
-        if (result) {
-            System.out.println(-1);
+        if (result == -1) {
+            System.out.println(result);
         } else {
             System.out.println(total - 1);
         }
+
+    }
+
+    static void bfs() {
+
+        while (!queue.isEmpty()) {
+            Tomato poll = queue.poll();
+
+            for (int i = 0; i < 4; i++) {
+                int nx = dx[i] + poll.x;
+                int ny = dy[i] + poll.y;
+
+                if (nx >= 0 && ny >= 0 && nx < m && ny < n && !visited[ny][nx] && box[ny][nx] != -1) {
+                    visited[ny][nx] = true;
+                    box[ny][nx] = poll.cnt + 1;
+                    queue.add(new Tomato(nx, ny, poll.cnt + 1));
+                }
+            }
+
+        }
+
     }
 }
