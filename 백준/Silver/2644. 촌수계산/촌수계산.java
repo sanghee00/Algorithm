@@ -2,18 +2,31 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
 public class Main {
-    static boolean[] visited;
     static List<Integer>[] adjList;
+    static boolean[] visited;
     static int cnt;
+    static int endNode;
     static int result = -1;
-    static int end;
 
-    public static void solution(int n, int[][] graph, int start) {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n = Integer.parseInt(br.readLine());
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        int person1 = Integer.parseInt(st.nextToken());
+        endNode = Integer.parseInt(st.nextToken());
+        int m = Integer.parseInt(br.readLine());
+        int[][] graph = new int[m][2];
+
+        for (int i = 0; i < m; i++) {
+            st = new StringTokenizer(br.readLine());
+            graph[i][0] = Integer.parseInt(st.nextToken());
+            graph[i][1] = Integer.parseInt(st.nextToken());
+        }
+
         adjList = new ArrayList[n + 1];
         visited = new boolean[n + 1];
 
@@ -26,43 +39,35 @@ public class Main {
             adjList[i[1]].add(i[0]);
         }
 
-        dfs(start);
+        dfs(person1);
+        System.out.println(result);
     }
 
-    public static void dfs(int start) {
-        visited[start] = true;
-        if (start == end) {
+    public static void dfs(int startNode) {
+        visited[startNode] = true;
+
+        if (startNode == endNode) {
             result = cnt;
-            return;
         }
 
-        for (int n : adjList[start]) {
-            if (!visited[n]) {
+        for (int i : adjList[startNode]) {
+            if (!visited[i]) {
+                visited[i] = true;
+
                 cnt++;
-                dfs(n);
+                dfs(i);
                 cnt--;
             }
         }
     }
-
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int n = Integer.parseInt(br.readLine()); // 전체 사람 수
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        int person1 = Integer.parseInt(st.nextToken());
-        end = Integer.parseInt(st.nextToken());
-
-        int m = Integer.parseInt(br.readLine()); // 관계의 수
-
-        int[][] graph = new int[m][2];
-
-        for (int i = 0; i < m; i++) {
-            st = new StringTokenizer(br.readLine());
-            graph[i][0] = Integer.parseInt(st.nextToken());
-            graph[i][1] = Integer.parseInt(st.nextToken());
-        }
-
-        solution(n, graph, person1);
-        System.out.println(result);
-    }
 }
+//9
+//7 3
+//7
+//1 2
+//1 3
+//2 7
+//2 8
+//2 9
+//4 5
+//4 6
