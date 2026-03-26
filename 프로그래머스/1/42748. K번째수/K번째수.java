@@ -4,12 +4,10 @@ class Solution {
     public int[] solution(int[] command, int[][] commands) {
         int[] answer = new int[commands.length];
         
-        int idx = 0;
-        for (int[] c : commands) {
-            int[] cutArrays = Arrays.copyOfRange(command, c[0] - 1, c[1]);
+        for (int i = 0; i < commands.length; i++) {
+            int[] cutArrays = Arrays.copyOfRange(command, commands[i][0] - 1, commands[i][1]);
             Arrays.sort(cutArrays);
-            answer[idx] = cutArrays[c[2] - 1];
-            idx++;
+            answer[i] = cutArrays[commands[i][2] - 1];
         }
         
         return answer;
