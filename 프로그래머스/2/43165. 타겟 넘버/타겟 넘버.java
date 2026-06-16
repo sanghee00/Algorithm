@@ -1,22 +1,22 @@
 class Solution {
-    public static int count;
+    static int count = 0;
     
     public int solution(int[] numbers, int target) {
-        dfs(numbers, 0, 0, target);
-       
+        dfs(numbers, 0, target, 0);    
         return count;
     }
     
-    void dfs(int[] numbers, int index, int sum, int target) {
+    void dfs(int[] numbers, int number, int target, int index) {
         if (numbers.length == index) {
-            if (sum == target) {
-                count++;
+            if (target == number) {
+                count++;   
             }
-            
             return;
         }
         
-        dfs(numbers, index + 1, sum + numbers[index], target);
-        dfs(numbers, index + 1, sum - numbers[index], target);
+        dfs(numbers, number + numbers[index], target, index + 1);
+        dfs(numbers, number - numbers[index], target, index + 1);
+        
     }
+    
 }
